@@ -87,57 +87,6 @@
             word-break: break-all;
         }
 
-        .share-section {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .share-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8f9fa;
-            color: #666;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            border: 1px solid #e9ecef;
-            cursor: pointer;
-        }
-
-        .share-btn:hover {
-            background: #e9ecef;
-            color: #495057;
-        }
-
-        .qr-tip {
-            text-align: center;
-            margin-top: 25px;
-            padding: 15px;
-            background: #f6f8fa;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #666;
-            border: 1px dashed #d0d7de;
-        }
-
-        .qr-icon {
-            color: #52c41a;
-            margin-right: 8px;
-            font-size: 18px;
-        }
-
-        .footer-text {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #999;
-        }
-
         .valid-indicator {
             display: inline-block;
             background: #52c41a;
@@ -151,43 +100,6 @@
         .icon-check::before {
             content: "✓";
             margin-right: 5px;
-        }
-
-        .icon-share::before {
-            content: "⇗";
-            margin-right: 5px;
-        }
-
-        /* 添加生成二维码的提示区域 */
-        .qr-guide {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #856404;
-            text-align: center;
-        }
-
-        .qr-guide strong {
-            color: #d39e00;
-        }
-
-        .copy-url-btn {
-            background: #17a2b8;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .copy-url-btn:hover {
-            background: #138496;
         }
 
         @media (max-width: 480px) {
@@ -252,80 +164,10 @@
                 <div class="info-label">报告时间：</div>
                 <div class="info-value">2025/04/15</div>
             </div>
-            
-            <div class="share-section">
-                <button class="share-btn icon-share" onclick="shareReport()">分享</button>
-            </div>
-            
-            <div class="qr-tip">
-                <span class="qr-icon">📱</span>
-                营料二维码<br>
-                今后可随时在 扫码记录 中查看该内容
-            </div>
-
-            <div class="qr-guide">
-                <strong>🔧 生成二维码方法：</strong><br>
-                1. 复制当前页面的网址<br>
-                2. 访问 <strong>cli.im</strong> 或 <strong>liantu.com</strong><br>
-                3. 粘贴网址生成二维码
-                <br><br>
-                <button class="copy-url-btn" onclick="copyCurrentUrl()">📋 复制当前页面网址</button>
-            </div>
-        </div>
-        
-        <div class="footer-text">
-            检测报告真伪验证系统<br>
-            <small>© 2025 创标检测</small>
         </div>
     </div>
 
     <script>
-        // 分享功能
-        function shareReport() {
-            if (navigator.share) {
-                navigator.share({
-                    title: '创标检测报告验证',
-                    text: '报告编号：WJIST20250410001SZLW - 报告有效',
-                    url: window.location.href
-                }).catch(console.error);
-            } else {
-                copyToClipboard(window.location.href);
-                alert('链接已复制到剪贴板');
-            }
-        }
-
-        // 复制当前页面URL
-        function copyCurrentUrl() {
-            const url = window.location.href;
-            copyToClipboard(url);
-            
-            const btn = event.target;
-            const originalText = btn.textContent;
-            btn.textContent = '✅ 已复制！';
-            btn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.background = '#17a2b8';
-            }, 2000);
-            
-            alert('✅ 页面网址已复制！\n\n请前往二维码生成网站：\n• cli.im (草料二维码)\n• liantu.com (联图网)\n\n粘贴网址生成二维码');
-        }
-
-        // 复制到剪贴板
-        function copyToClipboard(text) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text);
-            } else {
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-            }
-        }
-
         // 页面加载动画
         document.addEventListener('DOMContentLoaded', function() {
             const container = document.querySelector('.container');
@@ -337,22 +179,6 @@
                 container.style.opacity = '1';
                 container.style.transform = 'translateY(0)';
             }, 100);
-        });
-
-        // 防止右键和长按
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // 添加点击反馈效果
-        document.querySelectorAll('.share-btn, .copy-url-btn').forEach(btn => {
-            btn.addEventListener('touchstart', function() {
-                this.style.transform = 'scale(0.95)';
-            });
-            
-            btn.addEventListener('touchend', function() {
-                this.style.transform = 'scale(1)';
-            });
         });
     </script>
 </body>
