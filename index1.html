@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标签结构UE设计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            padding: 24px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .required {
+            color: #ff4d4f;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 8px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-input {
+            width: 16px;
+            height: 16px;
+            accent-color: #4f46e5;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-input {
+            width: 16px;
+            height: 16px;
+            accent-color: #4f46e5;
+        }
+
+        .tag-structure {
+            margin-top: 8px;
+        }
+
+        .tag-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .tag-type-selector {
+            min-width: 100px;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tag-type-selector:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .tag-type-selector.number {
+            color: #1890ff;
+            border-color: #e6f7ff;
+            background: #f6ffed;
+        }
+
+        .tag-type-selector.string {
+            color: #52c41a;
+            border-color: #f6ffed;
+            background: #f6ffed;
+        }
+
+        .tag-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .tag-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .tag-input.number {
+            border-color: #e6f7ff;
+        }
+
+        .tag-input.string {
+            border-color: #f6ffed;
+        }
+
+        .tag-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #f5f5f5;
+            border-color: #999;
+        }
+
+        .action-btn.add {
+            color: #52c41a;
+        }
+
+        .action-btn.delete {
+            color: #ff4d4f;
+        }
+
+        .add-tag-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .add-tag-btn:hover {
+            background: #4338ca;
+        }
+
+        .modal-footer {
+            padding: 0 24px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background: white;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+
+        .btn-cancel:hover {
+            background: #f5f5f5;
+            border-color: #999;
+        }
+
+        .btn-confirm {
+            background: #4f46e5;
+            color: white;
+            border: none;
+        }
+
+        .btn-confirm:hover {
+            background: #4338ca;
+        }
+
+        .type-icon {
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .placeholder-text {
+            color: #999;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">新增标签</h2>
+            <button class="close-btn">×</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="required">*</span> 标签名称
+                </label>
+                <input type="text" class="form-input" value="111" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="required">*</span> 存储字段名
+                </label>
+                <input type="text" class="form-input" value="111" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">标签描述</label>
+                <textarea class="form-textarea" placeholder="用于展示给标注人员，提示该指标如何选择，支持Markdown格式"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="required">*</span> 标签类型
+                </label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" class="radio-input" name="tagType" value="text" />
+                        <label>文本输入型</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" class="radio-input" name="tagType" value="radio" checked />
+                        <label>权重型</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" class="radio-input" name="tagType" value="extract" />
+                        <label>实体抽取</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">标签属性</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" class="checkbox-input" checked />
+                        <label>必填</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" class="checkbox-input" />
+                        <label>多选</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="required">*</span> 标签结构
+                </label>
+                <div class="tag-structure">
+                    <div class="tag-row">
+                        <select class="tag-type-selector number">
+                            <option value="number">📊 Number</option>
+                            <option value="string">📝 String</option>
+                        </select>
+                        <input type="text" class="tag-input number" placeholder="请输入数字值" />
+                        <div class="tag-actions">
+                            <button class="action-btn add">+</button>
+                            <button class="action-btn delete">🗑</button>
+                        </div>
+                    </div>
+
+                    <div class="tag-row">
+                        <select class="tag-type-selector string">
+                            <option value="number">📊 Number</option>
+                            <option value="string" selected>📝 String</option>
+                        </select>
+                        <input type="text" class="tag-input string" placeholder="请输入文本值" />
+                        <div class="tag-actions">
+                            <button class="action-btn add">+</button>
+                            <button class="action-btn delete">🗑</button>
+                        </div>
+                    </div>
+
+                    <div class="tag-row">
+                        <select class="tag-type-selector number">
+                            <option value="number" selected>📊 Number</option>
+                            <option value="string">📝 String</option>
+                        </select>
+                        <input type="text" class="tag-input number" placeholder="请输入数字值" />
+                        <div class="tag-actions">
+                            <button class="action-btn add">+</button>
+                            <button class="action-btn delete">🗑</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="add-tag-btn">+ 添加权重值</button>
+                <div class="placeholder-text">
+                    💡 提示：Number类型支持数字运算，String类型支持文本存储
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-cancel">取消</button>
+            <button class="btn btn-confirm">确定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 添加交互功能
+    document.querySelectorAll('.tag-type-selector').forEach(selector => {
+        selector.addEventListener('change', function() {
+            const row = this.closest('.tag-row');
+            const input = row.querySelector('.tag-input');
+            const selectedType = this.value;
+
+            // 更新样式
+            this.className = `tag-type-selector ${selectedType}`;
+            input.className = `tag-input ${selectedType}`;
+
+            // 更新占位符
+            if (selectedType === 'number') {
+                input.placeholder = '请输入数字值';
+                input.type = 'number';
+            } else {
+                input.placeholder = '请输入文本值';
+                input.type = 'text';
+            }
+
+            // 清空当前值
+            input.value = '';
+        });
+    });
+
+    // 添加删除功能
+    document.querySelectorAll('.action-btn.delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const row = this.closest('.tag-row');
+            if (document.querySelectorAll('.tag-row').length > 1) {
+                row.remove();
+            }
+        });
+    });
+
+    // 添加新行功能
+    document.querySelector('.add-tag-btn').addEventListener('click', function() {
+        const structure = document.querySelector('.tag-structure');
+        const newRow = document.createElement('div');
+        newRow.className = 'tag-row';
+        newRow.innerHTML = `
+                <select class="tag-type-selector number">
+                    <option value="number" selected>📊 Number</option>
+                    <option value="string">📝 String</option>
+                </select>
+                <input type="text" class="tag-input number" placeholder="请输入数字值" />
+                <div class="tag-actions">
+                    <button class="action-btn add">+</button>
+                    <button class="action-btn delete">🗑</button>
+                </div>
+            `;
+        structure.insertBefore(newRow, this);
+
+        // 为新行添加事件监听
+        const selector = newRow.querySelector('.tag-type-selector');
+        selector.addEventListener('change', function() {
+            const row = this.closest('.tag-row');
+            const input = row.querySelector('.tag-input');
+            const selectedType = this.value;
+
+            this.className = `tag-type-selector ${selectedType}`;
+            input.className = `tag-input ${selectedType}`;
+
+            if (selectedType === 'number') {
+                input.placeholder = '请输入数字值';
+                input.type = 'number';
+            } else {
+                input.placeholder = '请输入文本值';
+                input.type = 'text';
+            }
+
+            input.value = '';
+        });
+
+        newRow.querySelector('.action-btn.delete').addEventListener('click', function() {
+            if (document.querySelectorAll('.tag-row').length > 1) {
+                newRow.remove();
+            }
+        });
+    });
+</script>
+</body>
+</html>
